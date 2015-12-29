@@ -13,3 +13,13 @@ This Camel Splitter will split an Exchange containing an array of JSON messages 
         <to uri="queue:output">
       </split>
     </route>
+
+### Fluent Builders
+
+    RouteBuilder builder = new RouteBuilder() {
+      public void configure() {
+        from("direct:a")
+            .split(method(JsonArraySplitter.class))
+            .to("direct:b");
+      }
+    }
