@@ -10,20 +10,27 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tests for the JsonArraySplitter
+ *
+ * @author pwh
+ */
 public class JsonArraySplitterTest extends CamelTestSupport {
 
-    @EndpointInject(uri="mock:result")
+    @EndpointInject(uri = "mock:result")
     protected MockEndpoint resultEndpoint;
 
-    @Produce(uri="direct:start")
-    protected ProducerTemplate template;
+    @Produce(uri = "direct:start")
+    protected ProducerTemplate producerTemplate;
+
+    private static final ENDPOINT ="direct:start";
 
     @Test
-    public void testSendEmptyMessage() throws Exception {
+    public void testSendEmptyMessage() {
 
-        template.send("direct:start", new Processor() {
+        producerTemplate.send(ENDPOINT, new Processor() {
 
-            final String inputData = "[]";
+            static final String inputData = "[]";
 
             public void process(Exchange exchange) {
                 Message in = exchange.getIn();
@@ -40,11 +47,11 @@ public class JsonArraySplitterTest extends CamelTestSupport {
     }
 
     @Test
-    public void sendArrayWithSingleMessage() throws Exception {
+    public void sendArrayWithSingleMessage() {
 
-        template.send("direct:start", new Processor() {
+        producerTemplate.send(ENDPOINT, new Processor() {
 
-            final String inputData = "[\"foo\"]";
+            static final String inputData = "[\"foo\"]";
 
             public void process(Exchange exchange) {
                 Message in = exchange.getIn();
@@ -60,7 +67,7 @@ public class JsonArraySplitterTest extends CamelTestSupport {
 
         ArrayList messages = new ArrayList();
 
-        for(int i=0; i<1; i++) {
+        for (int i = 0; i < 1; i++) {
             Exchange exchange = list.get(i);
             Message in = exchange.getIn();
             messages.add(in.getBody().toString());
@@ -74,11 +81,11 @@ public class JsonArraySplitterTest extends CamelTestSupport {
     }
 
     @Test
-    public void sendArrayWithMultipleMessages() throws Exception {
+    public void sendArrayWithMultipleMessages() {
 
-        template.send("direct:start", new Processor() {
+        producerTemplate.send(ENDPOINT, new Processor() {
 
-            final String inputData = "[\"foo\", \"bar\"]";
+            static final String inputData = "[\"foo\", \"bar\"]";
 
             public void process(Exchange exchange) {
                 Message in = exchange.getIn();
@@ -94,7 +101,7 @@ public class JsonArraySplitterTest extends CamelTestSupport {
 
         ArrayList messages = new ArrayList();
 
-        for(int i=0; i<2; i++) {
+        for (int i = 0; i < 2; i++) {
             Exchange exchange = list.get(i);
             Message in = exchange.getIn();
             messages.add(in.getBody().toString());
@@ -112,7 +119,7 @@ public class JsonArraySplitterTest extends CamelTestSupport {
     protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() {
-                from("direct:start").split(method(JsonArraySplitter.class)).to("mock:result");
+                from(ENDPOINT).split(method(JsonArraySplitter.class)).to("mock:result");
             }
         };
     }

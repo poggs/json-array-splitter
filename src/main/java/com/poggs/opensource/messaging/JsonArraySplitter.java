@@ -7,7 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Splits a Camel Exchange with a body containing JSON messages in to individual messages
@@ -17,18 +17,17 @@ import java.util.List;
 public class JsonArraySplitter {
 
     @Handler
-    public List<String> processMessage(Exchange exchange) {
+    public Collection<String> processMessage(Exchange exchange) {
 
-        List<String> messageList = new ArrayList<String>();
+        Collection<String> messageList = new ArrayList<>();
 
         Message message = exchange.getIn();
         String msg = message.getBody(String.class);
 
         JSONArray jsonArray = (JSONArray) JSONValue.parse(msg);
 
-        for(int i=0; i<jsonArray.size(); i++) {
-            String jsonMsg = jsonArray.get(i).toString();
-            messageList.add(jsonMsg);
+        for (Object o : jsonArray) {
+            messageList.add(o.toString());
         }
 
         return messageList;
